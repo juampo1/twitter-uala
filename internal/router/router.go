@@ -2,7 +2,6 @@ package router
 
 import (
 	"net/http"
-	"twitter-uala/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,13 +16,6 @@ func SetupRouter() *gin.Engine {
 	})
 
 	//create a tweet
-	router.POST("{:userId}/tweet", func(c *gin.Context) {
-		var tweet models.Tweet
-		if err := c.ShouldBindJSON(&tweet); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-	})
 
 	return router
 }

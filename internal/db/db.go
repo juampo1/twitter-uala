@@ -5,7 +5,9 @@ import (
 	"log"
 
 	"twitter-uala/config"
-	"twitter-uala/internal/models"
+	followModels "twitter-uala/internal/domain/follow/models"
+	tweetModels "twitter-uala/internal/domain/tweet/models"
+	userModels "twitter-uala/internal/domain/user/models"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -27,7 +29,7 @@ func Connect() *gorm.DB {
 	}
 
 	// Migrar las estructuras a la base de datos
-	err = CONN.AutoMigrate(&models.User{}, &models.Tweet{}, &models.Follow{})
+	err = CONN.AutoMigrate(&userModels.User{}, &tweetModels.Tweet{}, &followModels.Follow{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
