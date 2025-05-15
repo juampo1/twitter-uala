@@ -20,6 +20,9 @@ func main() {
 	repos := repositories.NewRepositories(db.CONN)
 	services := domain.NewServices(repos)
 
+	seed := db.NewSeeder(db.CONN)
+	seed.Seed()
+
 	server := server.NewHTTPServer(gin.Default(), services, validator.New())
 	server.Run(fmt.Sprintf(":%s", config.ENV.Port))
 }

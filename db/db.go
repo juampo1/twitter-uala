@@ -33,6 +33,7 @@ func Connect() *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
+	CONN.Exec("PRAGMA foreign_keys = ON;")
 
 	log.Println("Database migrated successfully")
 
