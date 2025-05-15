@@ -2,8 +2,8 @@ package user
 
 import (
 	"context"
-	"twitter-uala/internal/domain/interfaces"
 	"twitter-uala/internal/domain/user/models"
+	"twitter-uala/internal/interfaces"
 
 	"gorm.io/gorm"
 )

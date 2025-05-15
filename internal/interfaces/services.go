@@ -8,5 +8,6 @@ import (
 type (
 	UserService interface {
 		FindUser(ctx context.Context, userID string) (*models.User, error)
+		CreateTweet(ctx context.Context, content, userID string) error
 	}
 )
