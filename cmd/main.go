@@ -2,9 +2,10 @@ package main
 
 import (
 	"twitter-uala/config"
-	"twitter-uala/internal/db"
+	"twitter-uala/db"
+	"twitter-uala/repositories"
+
 	"twitter-uala/internal/domain"
-	"twitter-uala/internal/repositories"
 )
 
 func main() {

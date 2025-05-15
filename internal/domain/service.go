@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"twitter-uala/internal/domain/interfaces"
-	"twitter-uala/internal/repositories"
+	"twitter-uala/internal/interfaces"
+	"twitter-uala/repositories"
 )
 
 type Services struct {

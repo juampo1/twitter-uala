@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"twitter-uala/internal/domain/interfaces"
-	"twitter-uala/internal/repositories/user"
+	"twitter-uala/repositories/user"
 
 	"gorm.io/gorm"
 )
