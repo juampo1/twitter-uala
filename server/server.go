@@ -38,8 +38,8 @@ func (s *HTTPServer) registerRoutes() {
 
 func (s *HTTPServer) CreateTweet(c *gin.Context) {
 	var tweetRequest dto.UserTweetRequest
-	userID, _ := c.Get("userId")
-	id := userID.(string)
+	id := c.Param("userId")
+	//id := userID.(string)
 
 	if err := c.ShouldBind(&tweetRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

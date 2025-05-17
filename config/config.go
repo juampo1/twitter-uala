@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -23,10 +21,9 @@ func Load() {
 
 	ENV = &env{Port: "", DBDriver: "", DBName: ""}
 
-	env := strings.ToLower(os.Getenv("GO_ENVIRONMENT"))
-	viper.SetConfigFile(fmt.Sprintf("%s.env", env))
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath("../")
 
 	if err := viper.ReadInConfig(); err != nil {
 		var vipErr viper.ConfigFileNotFoundError
@@ -37,9 +34,9 @@ func Load() {
 		}
 	}
 
-	if err := viper.Unmarshal(ENV); err != nil {
-		log.Fatalln(fmt.Errorf("failed to unmarshal config. %w", err))
-	}
+	ENV.Port = viper.GetString("server.port")
+	ENV.DBDriver = viper.GetString("db.driver")
+	ENV.DBName = viper.GetString("db.sqlite")
 
 	log.Println("app configs loaded")
 }

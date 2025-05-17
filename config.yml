@@ -1,0 +1,7 @@
+server:
+  port: "8080"
+db:
+  driver: "sqlite"
+  sqlite: "sqlite.db"
+
+env: "development"
