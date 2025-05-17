@@ -10,6 +10,7 @@ type (
 	UserService interface {
 		FindUser(ctx context.Context, userID string) (*userModels.User, error)
 		CreateTweet(ctx context.Context, content, userID string) error
+		FollowUser(ctx context.Context, followerID, followedUserID string) error
 	}
 
 	TweetService interface {

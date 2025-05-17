@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"twitter-uala/internal/domain/user/models"
 	"twitter-uala/internal/interfaces"
@@ -33,6 +34,29 @@ func (s *userService) CreateTweet(ctx context.Context, content, userID string) e
 	}
 
 	_, err = s.tweetService.CreateTweet(ctx, content, user.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *userService) FollowUser(ctx context.Context, followerID, followedUserID string) error {
+	if followerID == followedUserID {
+		return errors.New("a user cannot follow himself")
+	}
+
+	_, err := s.FindUser(ctx, followerID)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.FindUser(ctx, followedUserID)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.FollowUser(ctx, followerID, followedUserID)
 	if err != nil {
 		return err
 	}

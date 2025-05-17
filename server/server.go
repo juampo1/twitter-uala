@@ -34,12 +34,12 @@ func NewHTTPServer(engine *gin.Engine, services *domain.Services, validate *vali
 
 func (s *HTTPServer) registerRoutes() {
 	s.engine.POST(":userId/tweet", s.CreateTweet)
+	s.engine.POST(":userId/follow", s.FollowUser)
 }
 
 func (s *HTTPServer) CreateTweet(c *gin.Context) {
 	var tweetRequest dto.UserTweetRequest
 	id := c.Param("userId")
-	//id := userID.(string)
 
 	if err := c.ShouldBind(&tweetRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -63,4 +63,27 @@ func (s *HTTPServer) CreateTweet(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Tweet created successfully"})
+}
+
+func (s *HTTPServer) FollowUser(c *gin.Context) {
+	var followRequest dto.UserFollowRequest
+	followerID := c.Param("userId")
+
+	if err := c.ShouldBind(&followRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if followRequest.UserToFollowID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User to follow ID is required"})
+		return
+	}
+
+	err := s.services.UserService.FollowUser(c.Request.Context(), followerID, followRequest.UserToFollowID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "User followed successfully"})
 }

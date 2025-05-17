@@ -143,7 +143,7 @@ func (s *Seeder) Seed() {
 				// Crear la relación de seguimiento en la base de datos
 				follow := follow.Follow{
 					UserID:     user.ID,
-					FollowerID: follower.ID,
+					FollowedID: follower.ID,
 				}
 				if err := s.db.Create(&follow).Error; err != nil {
 					log.Printf("Error al insertar seguimiento de %s a %s: %v", follower.Username, user.Username, err)

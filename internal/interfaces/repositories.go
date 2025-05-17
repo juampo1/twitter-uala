@@ -9,6 +9,7 @@ import (
 type (
 	UserRepository interface {
 		FindUserByID(ctx context.Context, userID string) (*userModels.User, error)
+		FollowUser(ctx context.Context, followerID, followedUserID string) error
 	}
 	TweetRepository interface {
 		CreateTweet(ctx context.Context, tweet *tweetModels.Tweet) (*tweetModels.Tweet, error)
