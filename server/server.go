@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"twitter-uala/internal/domain"
 	"twitter-uala/server/dto"
+	"twitter-uala/server/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -33,9 +34,12 @@ func NewHTTPServer(engine *gin.Engine, services *domain.Services, validate *vali
 }
 
 func (s *HTTPServer) registerRoutes() {
-	s.engine.POST(":userId/tweet", s.CreateTweet)
-	s.engine.POST(":userId/follow", s.FollowUser)
-	s.engine.GET(":userId/timeline", s.GetTimeline)
+	auth := s.engine.Group("/").Use(middleware.AuthMiddleware())
+	{
+		auth.POST(":userId/tweet", s.CreateTweet)
+		auth.POST(":userId/follow", s.FollowUser)
+		auth.GET(":userId/timeline", s.GetTimeline)
+	}
 }
 
 func (s *HTTPServer) CreateTweet(c *gin.Context) {
