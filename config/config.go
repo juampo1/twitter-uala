@@ -23,7 +23,7 @@ func Load() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	viper.AddConfigPath("../")
+	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
 		var vipErr viper.ConfigFileNotFoundError
