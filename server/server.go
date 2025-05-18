@@ -35,6 +35,7 @@ func NewHTTPServer(engine *gin.Engine, services *domain.Services, validate *vali
 func (s *HTTPServer) registerRoutes() {
 	s.engine.POST(":userId/tweet", s.CreateTweet)
 	s.engine.POST(":userId/follow", s.FollowUser)
+	s.engine.GET(":userId/timeline", s.GetTimeline)
 }
 
 func (s *HTTPServer) CreateTweet(c *gin.Context) {
@@ -86,4 +87,21 @@ func (s *HTTPServer) FollowUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "User followed successfully"})
+}
+
+func (s *HTTPServer) GetTimeline(c *gin.Context) {
+	userId := c.Param("userId")
+
+	if userId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	tweets, err := s.services.UserService.GetTimeline(c.Request.Context(), userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"tweets": tweets})
 }

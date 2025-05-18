@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	tweetModels "twitter-uala/internal/domain/tweet/models"
 	"twitter-uala/internal/domain/user/models"
 	"twitter-uala/internal/interfaces"
 )
@@ -64,4 +65,23 @@ func (s *userService) FollowUser(ctx context.Context, followerID, followedUserID
 	}
 
 	return nil
+}
+
+func (s *userService) GetTimeline(ctx context.Context, userID string) (*[]tweetModels.Tweet, error) {
+	_, err := s.FindUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	followedUsers, err := s.repo.GetFollowedUsers(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	followedUsersTweets, err := s.tweetService.GetTweetsByUserIDs(ctx, followedUsers)
+	if err != nil {
+		return nil, err
+	}
+
+	return followedUsersTweets, nil
 }

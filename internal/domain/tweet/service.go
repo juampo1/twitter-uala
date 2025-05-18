@@ -2,6 +2,7 @@ package tweet
 
 import (
 	"context"
+	followModels "twitter-uala/internal/domain/follow/models"
 	"twitter-uala/internal/domain/tweet/models"
 	"twitter-uala/internal/interfaces"
 )
@@ -28,4 +29,12 @@ func (s *tweetService) CreateTweet(ctx context.Context, content, userID string) 
 	}
 
 	return createdTweet, nil
+}
+
+func (s *tweetService) GetTweetsByUserIDs(ctx context.Context, followedUsers []followModels.Follow) (*[]models.Tweet, error) {
+	tweets, err := s.repo.GetTweetsByUserIDs(ctx, followedUsers)
+	if err != nil {
+		return nil, err
+	}
+	return tweets, nil
 }

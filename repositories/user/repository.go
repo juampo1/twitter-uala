@@ -39,3 +39,11 @@ func (r *repository) FollowUser(ctx context.Context, followerID, followedUserID 
 
 	return nil
 }
+
+func (r *repository) GetFollowedUsers(ctx context.Context, userID string) ([]followModels.Follow, error) {
+	var followedUsers []followModels.Follow
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&followedUsers).Error; err != nil {
+		return nil, fmt.Errorf("could not get followed users: %w", err)
+	}
+	return followedUsers, nil
+}

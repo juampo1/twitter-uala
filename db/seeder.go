@@ -1,9 +1,12 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
+	"time"
 	follow "twitter-uala/internal/domain/follow/models"
+	tweet "twitter-uala/internal/domain/tweet/models"
 	"twitter-uala/internal/domain/user/models"
 
 	"gorm.io/gorm"
@@ -98,25 +101,25 @@ func (s *Seeder) Seed() {
 		},
 	}
 
-	// Crear mapa para almacenar relaciones de seguimiento y evitar duplicados
+	// Create a map to store follow relationships and avoid duplicates
 	followMap := make(map[string]map[string]bool)
 
-	// Inicializar el mapa
+	// Initialize the map
 	for _, user := range users {
 		followMap[user.ID] = make(map[string]bool)
 	}
 
-	// Asignar seguidores a cada usuario
+	// Assign followers to each user
 	for _, user := range users {
-		// Generar un número aleatorio de seguidores entre 5 y 10
+		// Generate a random number of followers between 5 and 10
 		numFollowers := rand.Intn(6) + 5
 
-		// insertar usuario en la base de datos
+		// insert user into the database
 		if err := s.db.Create(&user).Error; err != nil {
-			log.Fatalf("Error al insertar usuario %s: %v", user.Username, err)
+			log.Fatalf("Error inserting user %s: %v", user.Username, err)
 		}
 
-		// Obtener una lista de otros usuarios (excluyendo al usuario actual)
+		// Get a list of other users (excluding the current user)
 		var otherUsers []models.User
 		for _, u := range users {
 			if u.ID != user.ID {
@@ -124,24 +127,24 @@ func (s *Seeder) Seed() {
 			}
 		}
 
-		// Mezclar la lista de otros usuarios
+		// Shuffle the list of other users
 		rand.Shuffle(len(otherUsers), func(i, j int) {
 			otherUsers[i], otherUsers[j] = otherUsers[j], otherUsers[i]
 		})
 
-		// Ajustar si el número de seguidores excede el número de usuarios disponibles
+		// Adjust if the number of followers exceeds the number of available users
 		if numFollowers > len(otherUsers) {
 			numFollowers = len(otherUsers)
 		}
 
-		// Seleccionar los primeros 'numFollowers' usuarios como seguidores
+		// Select the first 'numFollowers' users as followers
 		followers := otherUsers[:numFollowers]
 
-		// Asignar seguidores al usuario actual
+		// Assign followers to the current user
 		for _, follower := range followers {
-			// Verificar si ya existe la relación para evitar duplicados
+			// Check if the relationship already exists to avoid duplicates
 			if !followMap[user.ID][follower.ID] {
-				// Crear la relación de seguimiento en la base de datos
+				// Create the follow relationship in the database
 				follow := follow.Follow{
 					UserID:     user.ID,
 					FollowedID: follower.ID,
@@ -150,11 +153,43 @@ func (s *Seeder) Seed() {
 					log.Printf("Error al insertar seguimiento de %s a %s: %v", follower.Username, user.Username, err)
 				}
 
-				// Marcar la relación como existente
+				// Mark the relationship as existing
 				followMap[user.ID][follower.ID] = true
 			}
 		}
 	}
+
+	// Create tweets for each user
+	for _, user := range users {
+		// Generate a random number of tweets between 1 and 5
+		numTweets := rand.Intn(5) + 1
+
+		// Create tweets for the current user
+		for i := 0; i < numTweets; i++ {
+			tweet := tweet.Tweet{
+				UserID:    user.ID,
+				Content:   fmt.Sprintf("Tweet %d from %s", i+1, user.Username),
+				CreatedAt: randomTimeFromNowToOneMonthAgo(),
+			}
+			if err := s.db.Create(&tweet).Error; err != nil {
+				log.Printf("Error inserting tweet for user %s: %v", user.Username, err)
+			}
+		}
+
+	}
+}
+
+func randomTimeFromNowToOneMonthAgo() time.Time {
+	now := time.Now()
+	// Define the duration of one month (approximately 30 days)
+	oneMonthAgo := now.AddDate(0, -1, 0)
+	// Calculate the difference in seconds
+	diff := now.Unix() - oneMonthAgo.Unix()
+	// Generate a random number of seconds within that range
+	randomSeconds := rand.Int63n(diff)
+	// Subtract the random seconds from now
+	randomTime := now.Add(-time.Duration(randomSeconds) * time.Second)
+	return randomTime
 }
 
 func (s *Seeder) DeleteAll() {
@@ -166,5 +201,10 @@ func (s *Seeder) DeleteAll() {
 	err = s.db.Exec("DELETE FROM follows").Error
 	if err != nil {
 		log.Fatalf("Error deleting follows table")
+	}
+
+	err = s.db.Exec("DELETE FROM tweets").Error
+	if err != nil {
+		log.Fatalf("Error deleting tweets table")
 	}
 }
