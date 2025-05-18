@@ -1,5 +1,5 @@
 package dto
 
 type UserFollowRequest struct {
-	UserToFollowID string `json:"userId" validate:"required"`
+	FollowedID string `json:"userId" validate:"required"`
 }

@@ -74,12 +74,12 @@ func (s *HTTPServer) FollowUser(c *gin.Context) {
 		return
 	}
 
-	if followRequest.UserToFollowID == "" {
+	if followRequest.FollowedID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User to follow ID is required"})
 		return
 	}
 
-	err := s.services.UserService.FollowUser(c.Request.Context(), followerID, followRequest.UserToFollowID)
+	err := s.services.UserService.FollowUser(c.Request.Context(), followerID, followRequest.FollowedID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

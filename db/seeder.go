@@ -18,6 +18,7 @@ func NewSeeder(db *gorm.DB) *Seeder {
 }
 
 func (s *Seeder) Seed() {
+	s.DeleteAll()
 	users := []models.User{
 		{
 			ID:       "1",
@@ -153,5 +154,17 @@ func (s *Seeder) Seed() {
 				followMap[user.ID][follower.ID] = true
 			}
 		}
+	}
+}
+
+func (s *Seeder) DeleteAll() {
+	err := s.db.Exec("DELETE FROM users").Error
+	if err != nil {
+		log.Fatalf("Error deleting users table")
+	}
+
+	err = s.db.Exec("DELETE FROM follows").Error
+	if err != nil {
+		log.Fatalf("Error deleting follows table")
 	}
 }
