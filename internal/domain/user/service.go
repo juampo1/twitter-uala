@@ -58,6 +58,16 @@ func (s *userService) FollowUser(ctx context.Context, followerID, followedUserID
 	}
 
 	//TODO: check if user is already followed by the follower
+	followedUser, err := s.repo.GetFollowedUsers(ctx, followerID)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range followedUser {
+		if user.FollowedID == followedUserID {
+			return errors.New("user already followed")
+		}
+	}
 
 	err = s.repo.FollowUser(ctx, followerID, followedUserID)
 	if err != nil {
