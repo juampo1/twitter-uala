@@ -16,11 +16,11 @@ import (
 func main() {
 	config.Load()
 	db.Connect()
-
-	repos := repositories.NewRepositories(db.CONN)
+	redis := db.Redis(config.ENV.RedisConfig)
+	repos := repositories.NewRepositories(db.CONN, redis)
 	services := domain.NewServices(repos)
 
-	seed := db.NewSeeder(db.CONN)
+	seed := db.NewSeeder(db.CONN, redis)
 	seed.Seed()
 
 	server := server.NewHTTPServer(gin.Default(), services, validator.New())

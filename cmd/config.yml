@@ -3,5 +3,10 @@ server:
 db:
   driver: "sqlite"
   sqlite: "sqlite.db"
+redis: 
+    addr: "localhost:6379"
+    password: ""
+    db: 0
+    protocol: 2
 
 env: "development"

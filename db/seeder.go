@@ -1,6 +1,8 @@
 package db
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -9,15 +11,17 @@ import (
 	tweet "twitter-uala/internal/domain/tweet/models"
 	"twitter-uala/internal/domain/user/models"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type Seeder struct {
-	db *gorm.DB
+	db    *gorm.DB
+	redis *redis.Client
 }
 
-func NewSeeder(db *gorm.DB) *Seeder {
-	return &Seeder{db: db}
+func NewSeeder(db *gorm.DB, redis *redis.Client) *Seeder {
+	return &Seeder{db: db, redis: redis}
 }
 
 func (s *Seeder) Seed() {
@@ -160,6 +164,7 @@ func (s *Seeder) Seed() {
 	}
 
 	// Create tweets for each user
+	ctx := context.Background()
 	for _, user := range users {
 		// Generate a random number of tweets between 1 and 5
 		numTweets := rand.Intn(5) + 1
@@ -174,9 +179,36 @@ func (s *Seeder) Seed() {
 			if err := s.db.Create(&tweet).Error; err != nil {
 				log.Printf("Error inserting tweet for user %s: %v", user.Username, err)
 			}
+			tweetKey := fmt.Sprintf("tweet:%s", tweet.UserID)
+			tweetData, err := GetTweetDataForRedis(tweet)
+			if err != nil {
+				log.Printf("Error getting tweet data for user %s: %v", user.Username, err)
+			}
+			val, err := s.redis.LPush(ctx, tweetKey, tweetData).Result()
+			if err != nil {
+				log.Printf("Error inserting tweet into the queue: %v", err)
+			}
+			fmt.Println(val)
 		}
-
 	}
+}
+
+func GetTweetDataForRedis(tweet tweet.Tweet) ([]byte, error) {
+	json, err := json.Marshal(struct {
+		ID        uint   `json:"id"`
+		UserID    string `json:"userID"`
+		Content   string `json:"content"`
+		CreatedAt string `json:"CreatedAt"`
+	}{
+		ID:        tweet.ID,
+		UserID:    tweet.UserID,
+		Content:   tweet.Content,
+		CreatedAt: tweet.CreatedAt.Format(time.RFC3339),
+	})
+	if err != nil {
+		log.Printf("Error marshalling tweet data for user %s: %v", tweet.UserID, err)
+	}
+	return json, nil
 }
 
 func randomTimeFromNowToOneMonthAgo() time.Time {
@@ -193,6 +225,7 @@ func randomTimeFromNowToOneMonthAgo() time.Time {
 }
 
 func (s *Seeder) DeleteAll() {
+	ctx := context.Background()
 	err := s.db.Exec("DELETE FROM users").Error
 	if err != nil {
 		log.Fatalf("Error deleting users table")
@@ -206,5 +239,19 @@ func (s *Seeder) DeleteAll() {
 	err = s.db.Exec("DELETE FROM tweets").Error
 	if err != nil {
 		log.Fatalf("Error deleting tweets table")
+	}
+
+	//delete tweets from redis
+	iter := s.redis.Scan(ctx, 0, "tweet:*", 0).Iterator()
+	for iter.Next(ctx) {
+		key := iter.Val()
+		err := s.redis.Del(ctx, key).Err()
+		if err != nil {
+			log.Printf("Error deleting tweet from redis: %v", err)
+		}
+	}
+
+	if err := iter.Err(); err != nil {
+		log.Printf("Error during the scan iteration: %v", err)
 	}
 }

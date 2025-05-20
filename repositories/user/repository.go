@@ -8,15 +8,17 @@ import (
 	userModels "twitter-uala/internal/domain/user/models"
 	"twitter-uala/internal/interfaces"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type repository struct {
-	db *gorm.DB
+	db    *gorm.DB
+	redis *redis.Client
 }
 
-func NewRepository(db *gorm.DB) interfaces.UserRepository {
-	return &repository{db: db}
+func NewRepository(db *gorm.DB, redis *redis.Client) interfaces.UserRepository {
+	return &repository{db: db, redis: redis}
 }
 
 func (r *repository) FindUserByID(ctx context.Context, userID string) (*models.User, error) {

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -9,11 +10,13 @@ import (
 	tweetModels "twitter-uala/internal/domain/tweet/models"
 	userModels "twitter-uala/internal/domain/user/models"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var CONN *gorm.DB
+var REDIS *redis.Client
 
 func Connect() *gorm.DB {
 	if CONN != nil {
@@ -47,4 +50,16 @@ func getDataBaseName() string {
 	}
 
 	return dbName
+}
+
+func Redis(redisConfig *redis.Options) *redis.Client {
+	REDIS := redis.NewClient(redisConfig)
+
+	if err := REDIS.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("Error connecting to Redis: %v", err)
+	}
+
+	log.Println("Connected to Redis successfully")
+
+	return REDIS
 }
