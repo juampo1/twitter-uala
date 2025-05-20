@@ -184,11 +184,10 @@ func (s *Seeder) Seed() {
 			if err != nil {
 				log.Printf("Error getting tweet data for user %s: %v", user.Username, err)
 			}
-			val, err := s.redis.LPush(ctx, tweetKey, tweetData).Result()
+			_, err = s.redis.LPush(ctx, tweetKey, tweetData).Result()
 			if err != nil {
 				log.Printf("Error inserting tweet into the queue: %v", err)
 			}
-			fmt.Println(val)
 		}
 	}
 }
