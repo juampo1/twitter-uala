@@ -25,7 +25,6 @@ POST http://localhost:8080/:userId/follow
     }
 ```
 - Autenticación: Requerida
-- TODO: Chequear si el usuario ya lo esta siguiendo
 
 GET http://localhost:8080/:userId/timeline
 - Permite al usuario userId obtener los tweets de los usarios que sigue
