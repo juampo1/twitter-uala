@@ -1,0 +1,9 @@
+- DB y CACHE
+    Se utiliza sqlite para almacenar los datos como base de datos y redis para almacenar los tweets
+    y optimizar el tiempo de lectura
+
+- Auth
+    Se aume que el usario esta logueado si en el header tiene un userId
+
+- Testing
+    Quedo pendientes agregar testing a los layers de los servicios y repositorios
