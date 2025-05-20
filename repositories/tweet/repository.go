@@ -41,7 +41,6 @@ func (r *repository) CreateTweet(ctx context.Context, tweet *models.Tweet) (*mod
 }
 
 func (r *repository) GetTweetsByUserIDs(ctx context.Context, followedUsers []followModels.Follow) (*[]models.Tweet, error) {
-	//var tweet []models.Tweet
 	var tweetsData []models.Tweet
 
 	for _, followedUser := range followedUsers {
