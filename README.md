@@ -6,7 +6,7 @@ Necesitamos tener instalado `docker` y `docker-compose`
 
 * El servicio corre en el puerto 8080
 
-# Hay 3 rutas disponibles
+# Rutas Disponibles
 
 POST http://localhost:8080/:userId/tweet
 - Crea un nuevo tweet para el usuario especificado, con el tweet en el body de la request
