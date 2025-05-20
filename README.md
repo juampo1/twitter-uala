@@ -15,7 +15,7 @@ POST http://localhost:8080/:userId/tweet
         "content": "new twwet for testing"
     }
 ```
-- Autenticación: Requerida
+- Autenticación: UserId requerido en el header
 
 POST http://localhost:8080/:userId/follow
 - Permite al usuario userId seguir a otro usario especificado en el body de la request
@@ -24,8 +24,9 @@ POST http://localhost:8080/:userId/follow
         "userId": "2"
     }
 ```
-- Autenticación: Requerida
+- Autenticación: UserId requerido en el header
 
 GET http://localhost:8080/:userId/timeline
 - Permite al usuario userId obtener los tweets de los usarios que sigue
-- Autenticación: Requerida
+
+- Autenticación: UserId requerido en el header
